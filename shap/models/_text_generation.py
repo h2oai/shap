@@ -3,16 +3,6 @@ from ._model import Model
 from ..utils import record_import_error, safe_isinstance
 from .._serializable import Serializer, Deserializer
 
-try:
-    import torch
-except ImportError as e:
-    record_import_error("torch", "Torch could not be imported!", e)
-
-try:
-    import tensorflow as tf
-except ImportError as e:
-    record_import_error("tensorflow", "TensorFlow could not be imported!", e)
-
 
 class TextGeneration(Model):
     """ Generates target sentence/ids using a base model.
@@ -146,6 +136,8 @@ class TextGeneration(Model):
                     "Please assign text generation params as a dictionary under task_specific_params with key 'text-generation' "
                 )
         if self.model_type == "pt":
+            # import pytorch lazily
+            import torch
             # create torch tensors and move to device
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') if self.device is None else self.device
             self.inner_model = self.inner_model.to(device)
@@ -157,6 +149,8 @@ class TextGeneration(Model):
                     inputs = self.get_inputs(X, padding_side="left").to(device)
                 outputs = self.inner_model.generate(**inputs, **text_generation_params).detach().cpu().numpy()
         elif self.model_type == "tf":
+            # import tensorflow lazily
+            import tensorflow as tf
             if self.inner_model.config.is_encoder_decoder:
                 inputs = self.get_inputs(X)
             else:

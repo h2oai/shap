@@ -95,3 +95,4 @@ docs/generated/shap.utils.sample.rst
 docs/generated/shap.utils.shapley_coefficients.rst
 docs/generated/shap.waterfall_plot.rst
 **/.coverage*
+venv
